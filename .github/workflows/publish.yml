@@ -1,0 +1,30 @@
+name: Publish using .NET Core
+on:
+  push:
+    tags:
+      - v[0-9]+.[0-9]+.[0-9]+
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.x
+    - name: Pack with dotnet
+      run: dotnet pack --include-symbols --configuration Release
+    - name: Upload artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: release
+        path: SlimLib.Auth.Azure/bin/Release
+    - name: Push with dotnet nuget
+      env:
+        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+      run: |
+        $file = Get-ChildItem -File SlimLib.Auth.Azure/bin/Release/SlimLib.Auth.Azure.*.symbols.nupkg
+        dotnet nuget push "$file" -s "https://api.nuget.org/v3/index.json" -k "$env:NUGET_API_KEY"

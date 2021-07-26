@@ -1,0 +1,3 @@
+# README
+
+Azure authentication helper.
