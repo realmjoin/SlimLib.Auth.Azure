@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SlimLib.Auth.Azure;
+using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -42,11 +43,14 @@ namespace Usage
 
             var authProvider = container.GetRequiredService<IAuthenticationProvider>();
 
-            var tenant = new AzureTenant("contoso.onmicrosoft.com");
-            var scope = "https://graph.microsoft.com/.default";
-            var request = new HttpRequestMessage();
+            var tenant = new AzureTenant(Configuration.GetValue<string>("Tenant"));
+            var scope = Configuration.GetValue<string>("Scope");
+
+            using var request = new HttpRequestMessage();
 
             await authProvider.AuthenticateRequestAsync(tenant, scope, request);
+
+            Console.WriteLine(request.Headers.Authorization);
         }
     }
 }
