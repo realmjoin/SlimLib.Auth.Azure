@@ -40,8 +40,9 @@ namespace Usage
             services.AddSingleton<IAuthenticationProvider>(sp => new AzureAuthenticationClient(clientCredentials, sp.GetRequiredService<IHttpClientFactory>().CreateClient(nameof(AzureAuthenticationClient)), sp.GetService<IMemoryCache>()));
 
             using var container = services.BuildServiceProvider();
+            using var serviceScope = container.CreateScope();
 
-            var authProvider = container.GetRequiredService<IAuthenticationProvider>();
+            var authProvider = serviceScope.ServiceProvider.GetRequiredService<IAuthenticationProvider>();
 
             var tenant = new AzureTenant(Configuration.GetValue<string>("Tenant"));
             var scope = Configuration.GetValue<string>("Scope");
