@@ -69,7 +69,7 @@ namespace SlimLib.Auth.Azure
                 return result;
             }
 
-            return await GetAuthenticationImplAsync(tenant, scope);
+            return await GetAuthenticationImplAsync(tenant, scope).ConfigureAwait(false);
         }
 
         private async Task<AuthSuccessResponse> GetAuthenticationImplAsync(IAzureTenant tenant, string scope)
