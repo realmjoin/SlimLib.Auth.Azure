@@ -57,11 +57,11 @@ namespace SlimLib.Auth.Azure
                     var response = await GetAuthenticationImplAsync(tenant, scope).ConfigureAwait(false);
                     var expiration = TimeSpan.FromSeconds(response.ExpiresIn - MinRemainingTokenLifetimeSeconds);
 
-                    if (expiration <= TimeSpan.FromSeconds(MinRemainingTokenCacheSeconds))
-                        return response;
-
-                    entry.SetAbsoluteExpiration(expiration);
-                    entry.Value = response;
+                    if (expiration > TimeSpan.FromSeconds(MinRemainingTokenCacheSeconds))
+                    {
+                        entry.SetAbsoluteExpiration(expiration);
+                        entry.Value = response;
+                    }
 
                     result = response;
                 }
