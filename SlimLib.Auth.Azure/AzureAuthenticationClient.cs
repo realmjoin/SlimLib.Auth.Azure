@@ -52,7 +52,7 @@ namespace SlimLib.Auth.Azure
 
                 if (!memoryCache.TryGetValue(key, out AuthSuccessResponse result))
                 {
-                    using ICacheEntry entry = memoryCache.CreateEntry(key);
+                    using var entry = memoryCache.CreateEntry(key);
 
                     var response = await GetAuthenticationImplAsync(tenant, scope).ConfigureAwait(false);
                     var expiration = TimeSpan.FromSeconds(response.ExpiresIn - MinRemainingTokenLifetimeSeconds);
