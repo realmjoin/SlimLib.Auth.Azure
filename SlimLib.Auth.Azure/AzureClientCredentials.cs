@@ -17,6 +17,11 @@ namespace SlimLib.Auth.Azure
         public string ClientID { get; set; } = "";
         public string ClientSecret { get; set; } = "";
 
+        public override string GetIdentifier(string scope)
+        {
+            return $"{ClientID}_{scope}";
+        }
+
         public override IDictionary<string, string> GetRequestData(string scope)
         {
             return new Dictionary<string, string>
