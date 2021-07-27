@@ -23,9 +23,9 @@ namespace SlimLib.Auth.Azure
             this.memoryCache = memoryCache;
         }
 
-        public static string GetCacheKey(IAzureTenant tenant, string scope)
+        public string GetCacheKey(IAzureTenant tenant, string scope)
         {
-            return $"{typeof(AzureAuthenticationClient).FullName}.{nameof(GetAuthenticationAsync)}_{tenant.Identifier}_{scope}";
+            return $"{typeof(AzureAuthenticationClient).FullName}.{nameof(GetAuthenticationAsync)}_{tenant.Identifier}_{azureCredentials.GetIdentifier(scope)}";
         }
 
         public void ClearCache(IAzureTenant tenant, string scope)
