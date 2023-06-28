@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SlimLib.Auth.Azure;
 using System;
 using System.Net.Http;
@@ -32,16 +33,26 @@ namespace Usage
                     .AddConsole();
             });
 
-            var clientCredentials = new AzureClientCredentials();
-            Configuration.GetSection("AzureAD").Bind(clientCredentials);
+            services.Configure<AzureClientCredentials>("MyCredentials", Configuration.GetSection("AzureAD"));
 
             services.AddHttpClient();
             services.AddMemoryCache();
-            services.AddSingleton<IAuthenticationProvider>(sp => new AzureAuthenticationClient(clientCredentials, sp.GetRequiredService<IHttpClientFactory>().CreateClient(nameof(AzureAuthenticationClient)), sp.GetService<IMemoryCache>()));
+
+            services.AddSingleton<IAuthenticationProvider>(sp =>
+            {
+                var clientCredentials = sp.GetRequiredService<IOptionsMonitor<AzureClientCredentials>>().Get("MyCredentials");
+
+                return new DemoAuthenticationClient(
+                    clientCredentials,
+                    sp.GetRequiredService<IHttpClientFactory>().CreateClient(nameof(DemoAuthenticationClient)),
+                    sp.GetRequiredService<IMemoryCache>(),
+                    sp.GetRequiredService<ILogger<DemoAuthenticationClient>>());
+            });
 
             using var container = services.BuildServiceProvider();
             using var serviceScope = container.CreateScope();
 
+            var logger = serviceScope.ServiceProvider.GetRequiredService<ILogger<Program>>();
             var authProvider = serviceScope.ServiceProvider.GetRequiredService<IAuthenticationProvider>();
 
             var tenant = new AzureTenant(Configuration.GetValue<string>("Tenant"));
@@ -50,8 +61,10 @@ namespace Usage
             using var request = new HttpRequestMessage();
 
             await authProvider.AuthenticateRequestAsync(tenant, scope, request);
+            await authProvider.AuthenticateRequestAsync(tenant, scope, request);
+            await authProvider.AuthenticateRequestAsync(tenant, scope, request);
 
-            Console.WriteLine(request.Headers.Authorization);
+            logger.LogInformation("Access token: {at}", request.Headers.Authorization);
         }
     }
 }
