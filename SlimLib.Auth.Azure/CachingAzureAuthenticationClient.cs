@@ -10,6 +10,8 @@ namespace SlimLib.Auth.Azure
         private const int MinRemainingTokenCacheSeconds = 1;
         private const int MinRemainingTokenLifetimeSeconds = 300;
 
+        public static readonly string CachePrefix = $"{typeof(CachingAzureAuthenticationClient).FullName}.{nameof(GetAuthenticationAsync)}_";
+
         private readonly IMemoryCache memoryCache;
 
         public CachingAzureAuthenticationClient(IAzureCredentials azureCredentials, HttpClient httpClient, IMemoryCache memoryCache) : base(azureCredentials, httpClient)
@@ -17,10 +19,8 @@ namespace SlimLib.Auth.Azure
             this.memoryCache = memoryCache;
         }
 
-        public string GetCacheKey(IAzureTenant tenant, string scope)
-        {
-            return $"{typeof(CachingAzureAuthenticationClient).FullName}.{nameof(GetAuthenticationAsync)}_{tenant.Identifier}_{AzureCredentials.GetIdentifier(scope)}";
-        }
+        public static string GetCachePrefixForTenant(IAzureTenant tenant) => CachePrefix + tenant.Identifier + "_";
+        public string GetCacheKey(IAzureTenant tenant, string scope) => GetCachePrefixForTenant(tenant) + AzureCredentials.GetIdentifier(scope);
 
         public void ClearCache(IAzureTenant tenant, string scope)
         {
