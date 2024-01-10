@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.JsonWebTokens;
 using SlimLib.Auth.Azure;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -36,7 +36,7 @@ namespace Usage
 
             logger.LogInformation("Received new token from server for {Tenant} with scope {Scope}", tenant.Identifier, scope);
 
-            var jwt = new JwtSecurityToken(message.AccessToken);
+            var jwt = new JsonWebToken(message.AccessToken);
 
             foreach (var item in jwt.Claims.Where(x => x.Type == "roles"))
             {
