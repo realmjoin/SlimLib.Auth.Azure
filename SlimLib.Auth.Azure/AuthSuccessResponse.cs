@@ -2,7 +2,7 @@
 
 namespace SlimLib.Auth.Azure
 {
-    public class AuthSuccessResponse : AuthResponse
+    public class AuthSuccessResponse : AuthResponse, IAuthSuccessResponse
     {
         internal AuthSuccessResponse()
         {
