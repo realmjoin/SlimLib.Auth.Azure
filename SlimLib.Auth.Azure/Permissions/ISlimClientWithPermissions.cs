@@ -2,7 +2,7 @@
 
 namespace SlimLib.Auth.Azure.Permissions;
 
-internal interface ISlimClientWithPermissions
+public interface ISlimClientWithPermissions
 {
     public IReadOnlyList<RequiredPermission> Permissions { get; }
 }
