@@ -13,6 +13,7 @@ public class ListRequestOptions
     public bool? Count { get; set; }
     public int? Skip { get; set; }
     public int? Top { get; set; }
+    public int? MaxPageSize { get; set; }
     public bool ConsistencyLevelEventual { get; set; }
 
     public JsonObject ToJson()

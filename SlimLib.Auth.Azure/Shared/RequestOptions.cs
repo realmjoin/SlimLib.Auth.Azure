@@ -3,9 +3,9 @@ using System.Linq;
 
 namespace SlimLib;
 
-internal static class RequestOptions
+public static class RequestOptions
 {
-    internal static string BuildLink(string call, IEnumerable<string> args)
+    public static string BuildLink(string call, IEnumerable<string> args)
     {
         if (args.Any())
         {
