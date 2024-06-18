@@ -62,4 +62,23 @@ public static class SlimApiExtensions
             }
         }
     }
+
+    public static async IAsyncEnumerable<T> DeserializePage<T>(this IAsyncEnumerable<JsonDocument> task, JsonSerializerOptions? options = null)
+    {
+        options ??= new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+        options.PropertyNamingPolicy ??= JsonNamingPolicy.CamelCase;
+
+        await foreach (var page in task)
+        {
+            using (page)
+            {
+                var item = page.RootElement.Deserialize<T>(options);
+
+                if (item is not null)
+                {
+                    yield return item;
+                }
+            }
+        }
+    }
 }
