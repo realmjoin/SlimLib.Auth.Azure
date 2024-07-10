@@ -50,7 +50,7 @@ namespace SlimLib.Auth.Azure
 
         protected virtual ValueTask<AuthSuccessResponse?> GetAuthenticationFromCacheAsync(IAzureTenant tenant, string scope)
         {
-            return ValueTask.FromResult(memoryCache.TryGetValue(GetCacheKey(tenant, scope), out AuthSuccessResponse result) ? result : null);
+            return ValueTask.FromResult(memoryCache.TryGetValue(GetCacheKey(tenant, scope), out AuthSuccessResponse? result) ? result : null);
         }
 
         protected override Task<AuthSuccessResponse> GetAuthenticationFromServerAsync(IAzureTenant tenant, string scope)
