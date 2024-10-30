@@ -55,8 +55,8 @@ namespace Usage
             var logger = serviceScope.ServiceProvider.GetRequiredService<ILogger<Program>>();
             var authProvider = serviceScope.ServiceProvider.GetRequiredService<IAuthenticationProvider>();
 
-            var tenant = new AzureTenant(Configuration.GetValue<string>("Tenant"));
-            var scope = Configuration.GetValue<string>("Scope");
+            var tenant = new AzureTenant(Configuration.GetValue<string>("Tenant")!);
+            var scope = Configuration.GetValue<string>("Scope")!;
 
             using var request = new HttpRequestMessage();
 
