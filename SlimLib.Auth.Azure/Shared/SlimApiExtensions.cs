@@ -13,14 +13,14 @@ public static class SlimApiExtensions
         return page.RootElement.GetProperty(ArrayRoot).EnumerateArray();
     }
 
-    public static async Task<JsonElement> AsJsonElement(this Task<JsonDocument?> task)
+    public static async Task<JsonElement> AsJsonElementAsync(this Task<JsonDocument?> task)
     {
         using var page = await task;
 
         return page is not null ? page.RootElement.Clone() : default;
     }
 
-    public static async IAsyncEnumerable<JsonElement> AsJsonElements(this IAsyncEnumerable<JsonDocument> task)
+    public static async IAsyncEnumerable<JsonElement> AsJsonElementsAsync(this IAsyncEnumerable<JsonDocument> task)
     {
         await foreach (var page in task)
         {
@@ -34,7 +34,7 @@ public static class SlimApiExtensions
         }
     }
 
-    public static async Task<T?> Deserialize<T>(this Task<JsonDocument?> task, JsonSerializerOptions? options = null)
+    public static async Task<T?> DeserializeItemAsync<T>(this Task<JsonDocument?> task, JsonSerializerOptions? options = null)
     {
         options ??= new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
         options.PropertyNamingPolicy ??= JsonNamingPolicy.CamelCase;
@@ -44,7 +44,7 @@ public static class SlimApiExtensions
         return page is not null ? page.RootElement.Deserialize<T>(options) : default;
     }
 
-    public static async IAsyncEnumerable<T[]> Deserialize<T>(this IAsyncEnumerable<JsonDocument> task, JsonSerializerOptions? options = null)
+    public static async IAsyncEnumerable<T[]> DeserializeItemsAsync<T>(this IAsyncEnumerable<JsonDocument> task, JsonSerializerOptions? options = null)
     {
         options ??= new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
         options.PropertyNamingPolicy ??= JsonNamingPolicy.CamelCase;
@@ -63,7 +63,7 @@ public static class SlimApiExtensions
         }
     }
 
-    public static async IAsyncEnumerable<T> DeserializePage<T>(this IAsyncEnumerable<JsonDocument> task, JsonSerializerOptions? options = null)
+    public static async IAsyncEnumerable<T> DeserializeAsync<T>(this IAsyncEnumerable<JsonDocument> task, JsonSerializerOptions? options = null)
     {
         options ??= new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
         options.PropertyNamingPolicy ??= JsonNamingPolicy.CamelCase;
