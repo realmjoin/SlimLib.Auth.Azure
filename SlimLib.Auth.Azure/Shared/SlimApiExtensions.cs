@@ -10,11 +10,6 @@ public static class SlimApiExtensions
 
     private static readonly JsonSerializerOptions DefaultJsonOptions = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
-    public static JsonElement.ArrayEnumerator EnumerateGraphResults(this JsonDocument page)
-    {
-        return page.RootElement.GetProperty(ArrayRoot).EnumerateArray();
-    }
-
     public static async Task<JsonElement> AsJsonElementAsync(this Task<JsonDocument?> task)
     {
         using var page = await task;
@@ -28,7 +23,7 @@ public static class SlimApiExtensions
         {
             using (page)
             {
-                foreach (var element in page.EnumerateGraphResults())
+                foreach (var element in page.RootElement.GetProperty(ArrayRoot).EnumerateArray())
                 {
                     yield return element.Clone();
                 }
