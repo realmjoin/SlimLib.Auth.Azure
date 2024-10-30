@@ -8,6 +8,8 @@ public static class SlimApiExtensions
 {
     private const string ArrayRoot = "value";
 
+    private static readonly JsonSerializerOptions DefaultJsonOptions = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+
     public static JsonElement.ArrayEnumerator EnumerateGraphResults(this JsonDocument page)
     {
         return page.RootElement.GetProperty(ArrayRoot).EnumerateArray();
@@ -36,24 +38,22 @@ public static class SlimApiExtensions
 
     public static async Task<T?> DeserializeItemAsync<T>(this Task<JsonDocument?> task, JsonSerializerOptions? options = null)
     {
-        options ??= new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-        options.PropertyNamingPolicy ??= JsonNamingPolicy.CamelCase;
+        var checkedOptions = CheckOptions(options);
 
         using var page = await task;
 
-        return page is not null ? page.RootElement.Deserialize<T>(options) : default;
+        return page is not null ? page.RootElement.Deserialize<T>(checkedOptions) : default;
     }
 
     public static async IAsyncEnumerable<T[]> DeserializeItemsAsync<T>(this IAsyncEnumerable<JsonDocument> task, JsonSerializerOptions? options = null)
     {
-        options ??= new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-        options.PropertyNamingPolicy ??= JsonNamingPolicy.CamelCase;
+        var checkedOptions = CheckOptions(options);
 
         await foreach (var page in task)
         {
             using (page)
             {
-                var items = page.RootElement.GetProperty(ArrayRoot).Deserialize<T[]>(options);
+                var items = page.RootElement.GetProperty(ArrayRoot).Deserialize<T[]>(checkedOptions);
 
                 if (items is not null)
                 {
@@ -65,14 +65,13 @@ public static class SlimApiExtensions
 
     public static async IAsyncEnumerable<T> DeserializeAsync<T>(this IAsyncEnumerable<JsonDocument> task, JsonSerializerOptions? options = null)
     {
-        options ??= new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-        options.PropertyNamingPolicy ??= JsonNamingPolicy.CamelCase;
+        var checkedOptions = CheckOptions(options);
 
         await foreach (var page in task)
         {
             using (page)
             {
-                var item = page.RootElement.Deserialize<T>(options);
+                var item = page.RootElement.Deserialize<T>(checkedOptions);
 
                 if (item is not null)
                 {
@@ -81,4 +80,11 @@ public static class SlimApiExtensions
             }
         }
     }
+
+    private static JsonSerializerOptions CheckOptions(JsonSerializerOptions? options) => options switch
+    {
+        null => DefaultJsonOptions,
+        { PropertyNamingPolicy: null } => new(options) { PropertyNamingPolicy = JsonNamingPolicy.CamelCase },
+        _ => options
+    };
 }
