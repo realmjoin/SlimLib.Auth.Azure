@@ -42,40 +42,43 @@ public record RequiredPermission : IReadOnlyList<string>
 
     public static string ToString(IEnumerable<RequiredPermission> permissions) => string.Join(" -OR- ", permissions);
 
-    public static List<RequiredPermission> AppendReadWrite(IEnumerable<RequiredPermission> permissions)
+    public static IEnumerable<RequiredPermission> AppendReadWrite(ICollection<RequiredPermission> permissions)
     {
-        var final = new List<RequiredPermission>();
-
         foreach (var permission in permissions)
         {
             if (permission.Count == 1)
             {
-                final.Add(permission[0]);
-                final.Add(Replace(permission[0]));
+                yield return permission[0];
+
+                var replace1 = new RequiredPermission(Replace(permission[0]));
+
+                if (!permissions.Contains(replace1))
+                    yield return replace1;
             }
             else if (permission.Count == 2)
             {
-                final.Add(new(permission[0], permission[1]));
-                final.Add(new(permission[0], Replace(permission[1])));
-                final.Add(new(Replace(permission[0]), permission[1]));
-                final.Add(new(Replace(permission[0]), Replace(permission[1])));
+                yield return new(permission[0], permission[1]);
+
+                var replace01 = new RequiredPermission(permission[0], Replace(permission[1]));
+
+                if (!permissions.Contains(replace01))
+                    yield return new(permission[0], Replace(permission[1]));
+
+                var replace10 = new RequiredPermission(Replace(permission[0]), permission[1]);
+
+                if (!permissions.Contains(replace10))
+                    yield return replace10;
+
+                var replace11 = new RequiredPermission(Replace(permission[0]), Replace(permission[1]));
+
+                if (!permissions.Contains(replace11))
+                    yield return replace11;
             }
             else
             {
                 throw new NotSupportedException("Only single or double permissions are supported.");
             }
         }
-
-        return final;
-    }
-
-    public static List<RequiredPermission> PrependReadWrite(IEnumerable<RequiredPermission> permissions)
-    {
-        var final = AppendReadWrite(permissions);
-
-        final.Reverse();
-
-        return final;
     }
 
     private static string Replace(string str) => str.Replace(".Read.", ".ReadWrite.");
