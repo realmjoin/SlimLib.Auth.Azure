@@ -32,15 +32,13 @@ public class InvokeRequestOptions
             request.Headers.Add("Prefer", "return=include-unknown-enum-members");
     }
 
-    public virtual JsonObject ToJson()
+    public virtual void ConfigureBatchRequest(JsonObject request)
     {
-        var json = new JsonObject();
-
         if (ConsistencyLevel == ConsistencyLevel.Eventual)
-            json.Add("ConsistencyLevel", "eventual");
+            request.Add("ConsistencyLevel", "eventual");
 
         if (UserAgent is not null)
-            json.Add("User-Agent", UserAgent);
+            request.Add("User-Agent", UserAgent);
 
         var preferValues = new List<string>();
 
@@ -56,8 +54,6 @@ public class InvokeRequestOptions
             preferValues.Add("return=include-unknown-enum-members");
 
         if (preferValues.Count > 0)
-            json.Add("Prefer", string.Join(", ", preferValues));
-
-        return json;
+            request.Add("Prefer", string.Join(", ", preferValues));
     }
 }
