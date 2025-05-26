@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json.Nodes;
@@ -34,11 +35,23 @@ public class InvokeRequestOptions
 
     public virtual void ConfigureBatchRequest(JsonObject request)
     {
+        var headers = request["headers"];
+
+        if (headers is null)
+        {
+            headers = new JsonObject();
+            request.Add("headers", headers);
+        }
+        else if (headers is not JsonObject)
+        {
+            throw new InvalidOperationException("The 'headers' property must be a JSON object.");
+        }
+
         if (ConsistencyLevel == ConsistencyLevel.Eventual)
-            request.Add("ConsistencyLevel", "eventual");
+            headers["ConsistencyLevel"] = "eventual";
 
         if (UserAgent is not null)
-            request.Add("User-Agent", UserAgent);
+            headers["User-Agent"] = UserAgent;
 
         var preferValues = new List<string>();
 
@@ -54,6 +67,6 @@ public class InvokeRequestOptions
             preferValues.Add("return=include-unknown-enum-members");
 
         if (preferValues.Count > 0)
-            request.Add("Prefer", string.Join(", ", preferValues));
+            request["Prefer"] = string.Join(",", preferValues);
     }
 }
