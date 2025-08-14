@@ -5,7 +5,7 @@
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <Nullable>enable</Nullable>
     <WarningsAsErrors>nullable</WarningsAsErrors>
-    <Version>11.0.1</Version>
+    <Version>11.0.2</Version>
   </PropertyGroup>
 
   <ItemGroup>
