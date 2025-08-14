@@ -19,7 +19,7 @@ public class InvokeRequestOptions
             request.Headers.Add("ConsistencyLevel", "eventual");
 
         if (UserAgent is not null)
-            request.Headers.UserAgent.Add(new ProductInfoHeaderValue(UserAgent));
+            request.Headers.Add("User-Agent", UserAgent);
 
         if (MaxPageSize.HasValue)
             request.Headers.Add("Prefer", $"odata.maxpagesize={MaxPageSize.Value}");
