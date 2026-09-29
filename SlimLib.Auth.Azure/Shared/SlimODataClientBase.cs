@@ -142,10 +142,13 @@ public abstract class SlimODataClientBase : ISlimHttpClient
 
         using var content = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
 
-        var doc = await JsonSerializer.DeserializeAsync<JsonDocument>(content, cancellationToken: cancellationToken);
+        var doc = await JsonDocument.ParseAsync(content, cancellationToken: cancellationToken).ConfigureAwait(false);
 
         if (!response.IsSuccessStatusCode)
-            throw CreateApiErrorFromDocument(response.StatusCode, response.Headers, doc);
+        {
+            using (doc)
+                throw CreateApiErrorFromDocument(response.StatusCode, response.Headers, doc);
+        }
 
         return doc;
     }
@@ -166,7 +169,7 @@ public abstract class SlimODataClientBase : ISlimHttpClient
 
         options?.ConfigureHttpRequest(request);
 
-        return await httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
+        return await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
     }
 
     protected static void HandleNextLink(JsonElement root, ref string? nextLink)
