@@ -1,0 +1,5 @@
+[tools]
+zizmor = "latest"
+
+[settings]
+install_before = "1d"
