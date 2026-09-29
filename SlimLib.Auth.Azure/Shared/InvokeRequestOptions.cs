@@ -67,6 +67,6 @@ public class InvokeRequestOptions
             preferValues.Add("return=include-unknown-enum-members");
 
         if (preferValues.Count > 0)
-            request["Prefer"] = string.Join(",", preferValues);
+            headers["Prefer"] = string.Join(",", preferValues);
     }
 }
